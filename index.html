@@ -15,7 +15,7 @@
     color: #000;
   }
   .overlay {
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.88);
     border-radius: 20px;
     max-width: 550px;
     margin: auto;
@@ -24,7 +24,7 @@
   }
   h2 {
     text-align: center;
-    color: #0f4c5c;
+    color: #8B0000;
   }
   label {
     display: block;
@@ -43,7 +43,7 @@
   button {
     margin-top: 15px;
     padding: 10px 20px;
-    background-color: #0f4c5c;
+    background-color: #8B0000;
     color: white;
     border: none;
     border-radius: 10px;
@@ -52,7 +52,7 @@
     width: 100%;
   }
   button:hover {
-    background-color: #136f63;
+    background-color: #a91c1c;
   }
   pre {
     background: #ffffffcc;
@@ -72,7 +72,7 @@
   <h2>نموذج الإجازة الداخلية</h2>
 
   <label>الكوبي يوزر:</label>
-  <input type="text" id="copyUser" placeholder="أدخل الكوبي يوزر">
+  <input type="text" id="copyUser" placeholder="أدخل الكوبي يوزر مثل 1198380929169764382">
 
   <label>مدة الإجازة (بالساعات):</label>
   <input type="number" id="vacationDuration" placeholder="أدخل المدة">
@@ -80,23 +80,51 @@
   <label>الرصيد المتبقي (بالساعات):</label>
   <input type="number" id="balance" placeholder="أدخل الرصيد">
 
-  <label>تبدأ من (الوقت):</label>
-  <input type="datetime-local" id="startTime">
+  <label>تبدأ من:</label>
+  <input type="date" id="startDate">
+  <input type="text" id="startTime" placeholder="أدخل الوقت مثل 10:00 ص أو 3:30 م">
 
   <button onclick="generate()">إنشاء القرار</button>
+  <button onclick="copyToClipboard()">نسخ القرار</button>
 
   <pre id="output"></pre>
 </div>
 
 <script>
+// Auto-set current date to today (Mecca time)
+window.onload = function() {
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Riyadh' });
+  document.getElementById('startDate').value = today;
+};
+
+function parseArabicTime(timeStr) {
+  // Convert Arabic-style AM/PM to 24-hour
+  timeStr = timeStr.replace(/\s+/g, '').replace('ص', 'AM').replace('م', 'PM');
+  const time = new Date(`1970-01-01T${timeStr}`);
+  if (isNaN(time)) return null;
+  return time;
+}
+
 function generate() {
-  const copyUser = document.getElementById("copyUser").value || "كوبي ايدي";
+  let copyUser = document.getElementById("copyUser").value.trim();
   const duration = parseFloat(document.getElementById("vacationDuration").value) || 0;
   const balance = parseFloat(document.getElementById("balance").value) || 0;
-  const startTime = document.getElementById("startTime").value;
+  const dateStr = document.getElementById("startDate").value;
+  const timeStr = document.getElementById("startTime").value.trim();
 
-  // Timezone adjustment for Mecca
-  const startDate = new Date(startTime);
+  if (!timeStr) return alert("⚠️ الرجاء إدخال وقت البدء مثل 10:00 ص أو 3:00 م");
+
+  // Add <@ > automatically if not included
+  if (copyUser && !copyUser.startsWith("<@")) {
+    copyUser = `<@${copyUser}>`;
+  }
+
+  // Parse start time
+  const parsedTime = parseArabicTime(timeStr);
+  if (!parsedTime) return alert("⚠️ تنسيق الوقت غير صحيح. استخدم مثل 10:00 ص أو 3:30 م");
+
+  const [hours, minutes] = [parsedTime.getHours(), parsedTime.getMinutes()];
+  const startDate = new Date(`${dateStr}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`);
   const endDate = new Date(startDate.getTime() + duration * 60 * 60 * 1000);
 
   const options = { 
@@ -108,7 +136,6 @@ function generate() {
 
   const startStr = startDate.toLocaleTimeString("ar-SA", options);
   const endStr = endDate.toLocaleTimeString("ar-SA", options);
-
   const remaining = balance - duration;
 
   const result = `
@@ -136,6 +163,13 @@ function generate() {
 `;
 
   document.getElementById("output").textContent = result;
+}
+
+function copyToClipboard() {
+  const text = document.getElementById("output").textContent;
+  if (!text.trim()) return alert("الرجاء إنشاء القرار أولاً");
+  navigator.clipboard.writeText(text);
+  alert("✅ تم نسخ القرار بنجاح!");
 }
 </script>
 
