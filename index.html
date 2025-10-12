@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>الاستقالة / إنهاء خدمات</title>
+<title>نموذج الانتداب</title>
 <style>
   body {
     font-family: "Tahoma", sans-serif;
@@ -69,29 +69,24 @@
 <body>
 
 <div class="overlay">
-  <h2>الاستقالة / إنهاء خدمات</h2>
-
-  <label>مستوى المسعف:</label>
-  <select id="level" onchange="updateFields()">
-    <option value="">-- اختر المستوى --</option>
-    <option value="متدرب">متدرب</option>
-    <option value="مستوى 1">مستوى 1</option>
-    <option value="مستوى 2 فما فوق">مستوى 2 فما فوق</option>
-  </select>
-
-  <label>اسمه وكوده الميداني:</label>
-  <input type="text" id="nameCode" placeholder="أدخل الاسم والرقم الميداني">
+  <h2>نموذج الانتداب</h2>
 
   <label>الكوبي ايدي:</label>
-  <input type="text" id="copyId" placeholder="أدخل الكوبي ايدي مثل 1198380929169764382">
+  <input type="text" id="copyId" placeholder="أدخل الكوبي ايدي ">
 
-  <div id="violationsField" style="display:none;">
-    <label>هل يوجد عليه مخالفات سابقه:</label>
-    <select id="hasViolations">
-      <option value="لا">لا</option>
-      <option value="نعم">نعم</option>
-    </select>
-  </div>
+  <label>اختر القطاع المنتدب اليه:</label>
+  <select id="sector">
+    <option value="">-- اختر القطاع --</option>
+    <option value="حرس الحدود">حرس الحدود</option>
+    <option value="امن عام">امن عام</option>
+    <option value="امن الطرق">امن الطرق</option>
+    <option value="امن المنشات">امن المنشات</option>
+    <option value="كراج الميكانيكي">كراج الميكانيكي</option>
+    <option value="قوات الطوراى الخاصه">قوات الطوراى الخاصه</option>
+  </select>
+
+  <label>المدة بالايام:</label>
+  <input type="number" id="duration" placeholder="أدخل المدة بالأيام">
 
   <button onclick="generate()">إنشاء القرار</button>
   <button onclick="copyToClipboard()">نسخ القرار</button>
@@ -100,45 +95,41 @@
 </div>
 
 <script>
-function updateFields() {
-  const level = document.getElementById('level').value;
-  // Show violations only for مستوى 2 فما فوق
-  document.getElementById('violationsField').style.display = (level === 'مستوى 2 فما فوق') ? 'block' : 'none';
-}
-
 function generate() {
-  const level = document.getElementById('level').value;
-  const nameCode = document.getElementById('nameCode').value.trim();
   let copyId = document.getElementById('copyId').value.trim();
-  const hasViolations = document.getElementById('hasViolations').value;
+  let sector = document.getElementById('sector').value;
+  let duration = parseInt(document.getElementById('duration').value.trim());
 
-  if (!level) return alert('⚠️ الرجاء اختيار مستوى المسعف');
-  if (!nameCode) return alert('⚠️ الرجاء إدخال اسمه وكوده الميداني');
-  if (!copyId) return alert('⚠️ الرجاء إدخال الكوبي ايدي');
-  if (!copyId.startsWith('<@')) copyId = `<@${copyId}>`;
+  if (!copyId) return alert("⚠️ الرجاء إدخال الكوبي ايدي");
+  if (!sector) return alert("⚠️ الرجاء اختيار القطاع");
+  if (isNaN(duration) || duration <= 0) duration = 0;
 
-  let result = '';
+  if (!copyId.startsWith("<@")) copyId = `<@${copyId}>`;
 
-  if (level === 'متدرب' || level === 'مستوى 1') {
-    let days = level === 'متدرب' ? 14 : 7;
-    let fine = level === 'متدرب' ? '1,000,000' : '500,000';
-    let reason = level === 'متدرب' ? 'استقالة بمستوى متدرب' : 'استقالة بمستوى 1';
+  // Get today's date in Riyadh timezone
+  let tzDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Riyadh" }));
 
-    result = `﷽**
+  // Add duration days
+  tzDate.setDate(tzDate.getDate() + duration);
 
-قرار صـادر مـن <@&1071933369698496532> 
+  let yyyy = tzDate.getFullYear();
+  let mm = String(tzDate.getMonth()+1).padStart(2,'0');
+  let dd = String(tzDate.getDate()).padStart(2,'0');
+  let endDate = `${yyyy}/${mm}/${dd}`;
 
-الموضوع : إنهاء خدمات
+  let result = `﷽
 
-المسعف : ${copyId}
+**قرار صادر من <@&1071933369698496532> 
 
-اسمه وكوده الميداني : ${nameCode}
+الموضوع : انتداب
 
-هل يوجد عليه مخالفات سابقه : 
- 
-العقوبة الاجماليه : فصل من الخدمه + منع من التوظيف (${days}) ايام + غرامه مالية بقيمه (${fine})
+للمسعف : ${copyId}
 
-سبب الفصل من الخدمة : ${reason}
+القطاع المنتدب له : ${sector}
+
+المدة : ${duration}
+
+الى تاريخ : ${endDate}
 
 
 إعتماد :
@@ -146,32 +137,7 @@ function generate() {
 <@725655707764129813>  
 
 <@&1071933359086911561> 
-<@813079786855464961>   **`;
-  } else if (level === 'مستوى 2 فما فوق') {
-    const violationsText = hasViolations ? hasViolations : 'لا';
-
-    result = `﷽**
-
-قرار صـادر مـن <@&1071933369698496532> 
-
-الموضوع : استقالة 
-
-المسعف : ${copyId}
-
-اسمه وكوده الميداني : ${nameCode}
-
-هل يوجد عليه مخالفات سابقه : ${violationsText}  
-
-نشكر جهودك المبذولة والملحوظة لدى القطاع ونسأل الله لك التوفيق
-
-
-إعتماد :
-<@&1071933358503903242>
-<@725655707764129813>  
-
-<@&1071933359086911561> 
-<@813079786855464961>   **`;
-  }
+<@813079786855464961>    **`;
 
   document.getElementById('output').textContent = result;
 }
@@ -186,3 +152,4 @@ function copyToClipboard() {
 
 </body>
 </html>
+
