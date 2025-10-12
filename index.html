@@ -15,7 +15,7 @@
     color: #000;
   }
   .overlay {
-    background-color: rgba(255, 255, 255, 0.88);
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 20px;
     max-width: 550px;
     margin: auto;
@@ -31,7 +31,7 @@
     margin-top: 10px;
     font-weight: bold;
   }
-  input {
+  input, select {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
@@ -39,6 +39,13 @@
     border: 1px solid #ccc;
     text-align: right;
     font-size: 15px;
+  }
+  .time-group {
+    display: flex;
+    gap: 10px;
+  }
+  .time-group input, .time-group select {
+    flex: 1;
   }
   button {
     margin-top: 15px;
@@ -75,14 +82,20 @@
   <input type="text" id="copyUser" placeholder="أدخل الكوبي يوزر مثل 1198380929169764382">
 
   <label>مدة الإجازة (بالساعات):</label>
-  <input type="number" id="vacationDuration" placeholder="أدخل المدة">
+  <input type="number" id="vac_duration" placeholder="عدد الساعات">
 
   <label>الرصيد المتبقي (بالساعات):</label>
-  <input type="number" id="balance" placeholder="أدخل الرصيد">
+  <input type="number" id="vac_balance" placeholder="عدد الساعات">
 
-  <label>تبدأ من:</label>
-  <input type="date" id="startDate">
-  <input type="text" id="startTime" placeholder="أدخل الوقت مثل 10:00 ص أو 3:30 م">
+  <label>وقت بدء الإجازة:</label>
+  <div class="time-group">
+    <input type="number" id="vac_startHour" placeholder="الساعة (1-12)">
+    <input type="number" id="vac_startMinute" placeholder="الدقيقة (0-59)">
+    <select id="vac_startPeriod">
+      <option value="ص">صباحًا</option>
+      <option value="م">مساءً</option>
+    </select>
+  </div>
 
   <button onclick="generate()">إنشاء القرار</button>
   <button onclick="copyToClipboard()">نسخ القرار</button>
@@ -91,54 +104,55 @@
 </div>
 
 <script>
-// Auto-set current date to today (Mecca time)
-window.onload = function() {
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Riyadh' });
-  document.getElementById('startDate').value = today;
-};
-
-function parseArabicTime(timeStr) {
-  // Convert Arabic-style AM/PM to 24-hour
-  timeStr = timeStr.replace(/\s+/g, '').replace('ص', 'AM').replace('م', 'PM');
-  const time = new Date(`1970-01-01T${timeStr}`);
-  if (isNaN(time)) return null;
-  return time;
-}
-
 function generate() {
   let copyUser = document.getElementById("copyUser").value.trim();
-  const duration = parseFloat(document.getElementById("vacationDuration").value) || 0;
-  const balance = parseFloat(document.getElementById("balance").value) || 0;
-  const dateStr = document.getElementById("startDate").value;
-  const timeStr = document.getElementById("startTime").value.trim();
+  let duration = parseFloat(document.getElementById("vac_duration").value) || 0;
+  let balance = parseFloat(document.getElementById("vac_balance").value) || 0;
+  let startHour = parseInt(document.getElementById("vac_startHour").value);
+  let startMinute = parseInt(document.getElementById("vac_startMinute").value);
+  let period = document.getElementById("vac_startPeriod").value;
 
-  if (!timeStr) return alert("⚠️ الرجاء إدخال وقت البدء مثل 10:00 ص أو 3:00 م");
+  if (!startHour || startHour < 1 || startHour > 12)
+    return alert("⚠️ الرجاء إدخال ساعة صحيحة (1 - 12)");
+  if (isNaN(startMinute) || startMinute < 0 || startMinute > 59)
+    return alert("⚠️ الرجاء إدخال دقيقة صحيحة (0 - 59)");
 
-  // Add <@ > automatically if not included
+  // Convert AM/PM Arabic to 24-hour format
+  if (period === "م" && startHour < 12) startHour += 12;
+  if (period === "ص" && startHour === 12) startHour = 0;
+
+  // Get current date in Riyadh timezone
+  let tzDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Riyadh" }));
+  let yyyy = tzDate.getFullYear();
+  let mm = String(tzDate.getMonth() + 1).padStart(2, '0');
+  let dd = String(tzDate.getDate()).padStart(2, '0');
+
+  // Build start & end times
+  let startDate = new Date(`${yyyy}-${mm}-${dd}T${String(startHour).padStart(2,'0')}:${String(startMinute).padStart(2,'0')}:00`);
+  let endDate = new Date(startDate);
+  endDate.setHours(endDate.getHours() + duration);
+
+  // Format the date/time nicely in Arabic
+  function formatDate(date) {
+    let y = date.getFullYear();
+    let m = String(date.getMonth() + 1).padStart(2, '0');
+    let d = String(date.getDate()).padStart(2, '0');
+    let h = date.getHours();
+    let min = String(date.getMinutes()).padStart(2, '0');
+    let per = h >= 12 ? "م" : "ص";
+    h = h % 12;
+    h = h ? h : 12;
+    return `${y}/${m}/${d} | ${h}:${min} ${per}`;
+  }
+
+  // Wrap ID with <@ >
   if (copyUser && !copyUser.startsWith("<@")) {
     copyUser = `<@${copyUser}>`;
   }
 
-  // Parse start time
-  const parsedTime = parseArabicTime(timeStr);
-  if (!parsedTime) return alert("⚠️ تنسيق الوقت غير صحيح. استخدم مثل 10:00 ص أو 3:30 م");
+  let remaining = balance - duration;
 
-  const [hours, minutes] = [parsedTime.getHours(), parsedTime.getMinutes()];
-  const startDate = new Date(`${dateStr}T${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:00`);
-  const endDate = new Date(startDate.getTime() + duration * 60 * 60 * 1000);
-
-  const options = { 
-    hour: "2-digit", 
-    minute: "2-digit", 
-    hour12: true, 
-    timeZone: "Asia/Riyadh" 
-  };
-
-  const startStr = startDate.toLocaleTimeString("ar-SA", options);
-  const endStr = endDate.toLocaleTimeString("ar-SA", options);
-  const remaining = balance - duration;
-
-  const result = `
+  let result = `
 ﷽
 
 **قرار صـادر مـن <@&1071933369698496532>**
@@ -149,8 +163,8 @@ function generate() {
 
 المدة : ${duration} ساعة
 
-من الساعة : ${startStr}
-إلى الساعة : ${endStr}
+من الساعة : ${formatDate(startDate)}
+إلى الساعة : ${formatDate(endDate)}
 
 الرصيد المتبقي : ${remaining} ساعة
 
