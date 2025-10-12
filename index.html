@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>الإجازة الداخلية</title>
+<title>إجازة خارجية</title>
 <style>
   body {
     font-family: "Tahoma", sans-serif;
@@ -17,7 +17,7 @@
   .overlay {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 20px;
-    max-width: 550px;
+    max-width: 600px;
     margin: auto;
     padding: 25px 30px;
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
@@ -39,13 +39,6 @@
     border: 1px solid #ccc;
     text-align: right;
     font-size: 15px;
-  }
-  .time-group {
-    display: flex;
-    gap: 10px;
-  }
-  .time-group input, .time-group select {
-    flex: 1;
   }
   button {
     margin-top: 15px;
@@ -76,25 +69,30 @@
 <body>
 
 <div class="overlay">
-  <h2> الإجازة الداخلية</h2>
+  <h2>إجازة خارجية</h2>
 
-  <label>الكوبي يوزر:</label>
-  <input type="text" id="copyUser" placeholder="أدخل الكوبي يوزر">
+  <label>أختر نوع الاجازة الخارجية:</label>
+  <select id="leaveType" onchange="updateForm()">
+    <option value="">-- اختر نوع الإجازة --</option>
+    <option value="اجازة خارجية">اجازة خارجية</option>
+    <option value="تمديد اجازة خارجية">تمديد اجازة خارجية</option>
+  </select>
 
-  <label>مدة الإجازة (بالساعات):</label>
-  <input type="number" id="vac_duration" placeholder="عدد الساعات">
+  <div id="commonFields">
+    <label>الكوبي ايدي:</label>
+    <input type="text" id="copyUser" placeholder="أدخل الكوبي ايدي مثل 1198380929169764382">
+  </div>
 
-  <label>الرصيد المتبقي (بالساعات):</label>
-  <input type="number" id="vac_balance" placeholder="عدد الساعات">
+  <div id="externalLeaveFields" style="display:none;">
+    <label>مدة الإجازة (بالأيام):</label>
+    <input type="number" id="leaveDays" min="1" placeholder="أدخل عدد الأيام">
+  </div>
 
-  <label>وقت بدء الإجازة:</label>
-  <div class="time-group">
-    <input type="number" id="vac_startHour" placeholder="الساعة (1-12)">
-    <input type="number" id="vac_startMinute" placeholder="الدقيقة (0-59)">
-    <select id="vac_startPeriod">
-      <option value="ص">صباحًا</option>
-      <option value="م">مساءً</option>
-    </select>
+  <div id="extensionFields" style="display:none;">
+    <label>تاريخ انتهاء الاجازة السابقة:</label>
+    <input type="date" id="previousEndDate">
+    <label>مدة التمديد (بالأيام):</label>
+    <input type="number" id="extensionDays" min="1" placeholder="أدخل عدد الأيام">
   </div>
 
   <button onclick="generate()">إنشاء القرار</button>
@@ -104,83 +102,99 @@
 </div>
 
 <script>
+function updateForm() {
+  const type = document.getElementById('leaveType').value;
+  document.getElementById('externalLeaveFields').style.display = (type === 'اجازة خارجية') ? 'block' : 'none';
+  document.getElementById('extensionFields').style.display = (type === 'تمديد اجازة خارجية') ? 'block' : 'none';
+}
+
+function formatDate(date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2,'0');
+  const dd = String(date.getDate()).padStart(2,'0');
+  return `${dd}-${mm}-${yyyy}`;
+}
+
 function generate() {
+  const type = document.getElementById('leaveType').value;
+  if (!type) return alert('⚠️ الرجاء اختيار نوع الإجازة');
+
   let copyUser = document.getElementById("copyUser").value.trim();
-  let duration = parseFloat(document.getElementById("vac_duration").value) || 0;
-  let balance = parseFloat(document.getElementById("vac_balance").value) || 0;
-  let startHour = parseInt(document.getElementById("vac_startHour").value);
-  let startMinute = parseInt(document.getElementById("vac_startMinute").value);
-  let period = document.getElementById("vac_startPeriod").value;
+  if (!copyUser) return alert('⚠️ الرجاء إدخال الكوبي ايدي');
+  if (!copyUser.startsWith('<@')) copyUser = `<@${copyUser}>`;
 
-  if (!startHour || startHour < 1 || startHour > 12)
-    return alert("⚠️ الرجاء إدخال ساعة صحيحة (1 - 12)");
-  if (isNaN(startMinute) || startMinute < 0 || startMinute > 59)
-    return alert("⚠️ الرجاء إدخال دقيقة صحيحة (0 - 59)");
-
-  // Convert AM/PM Arabic to 24-hour format
-  if (period === "م" && startHour < 12) startHour += 12;
-  if (period === "ص" && startHour === 12) startHour = 0;
-
-  // Get current date in Riyadh timezone
+  // Get Riyadh timezone today
   let tzDate = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Riyadh" }));
-  let yyyy = tzDate.getFullYear();
-  let mm = String(tzDate.getMonth() + 1).padStart(2, '0');
-  let dd = String(tzDate.getDate()).padStart(2, '0');
 
-  // Build start & end times
-  let startDate = new Date(`${yyyy}-${mm}-${dd}T${String(startHour).padStart(2,'0')}:${String(startMinute).padStart(2,'0')}:00`);
-  let endDate = new Date(startDate);
-  endDate.setHours(endDate.getHours() + duration);
+  let message = '';
 
-  // Format the date/time nicely in Arabic
-  function formatDate(date) {
-    let y = date.getFullYear();
-    let m = String(date.getMonth() + 1).padStart(2, '0');
-    let d = String(date.getDate()).padStart(2, '0');
-    let h = date.getHours();
-    let min = String(date.getMinutes()).padStart(2, '0');
-    let per = h >= 12 ? "م" : "ص";
-    h = h % 12;
-    h = h ? h : 12;
-    return `${y}/${m}/${d} | ${h}:${min} ${per}`;
-  }
+  if (type === 'اجازة خارجية') {
+    const leaveDays = parseInt(document.getElementById('leaveDays').value);
+    if (!leaveDays || leaveDays <= 0) return alert('⚠️ الرجاء إدخال مدة الإجازة بالأيام صحيحة');
 
-  // Wrap ID with <@ >
-  if (copyUser && !copyUser.startsWith("<@")) {
-    copyUser = `<@${copyUser}>`;
-  }
+    const startDate = tzDate;
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + leaveDays);
 
-  let remaining = balance - duration;
+    message = `﷽**
 
-  let result = `
-﷽
+قرار صـادر مـن <@&1071933369698496532> 
 
-**قرار صـادر مـن <@&1071933369698496532>**
-
-الموضوع : إجازة داخلية
+الموضوع : اجازة خارجية 
 
 للمسعف : ${copyUser}
 
-المدة : ${duration} ساعة
+المدة : ${leaveDays} يوم
 
-من الساعة : ${formatDate(startDate)}
-إلى الساعة : ${formatDate(endDate)}
+من تاريخ : ${formatDate(startDate)}
 
-الرصيد المتبقي : ${remaining} ساعة
+إلى تاريخ : ${formatDate(endDate)}
+
 
 إعتماد :
-<@&1071933358503903242>
-<@725655707764129813>
+<@&1071933358503903242> 
+<@725655707764129813>  
 
-<@&1071933359086911561>
-<@813079786855464961>
-`;
+<@&1071933359086911561> 
+<@813079786855464961>   **`;
+  }
 
-  document.getElementById("output").textContent = result;
+  if (type === 'تمديد اجازة خارجية') {
+    const prevEndStr = document.getElementById('previousEndDate').value;
+    const extensionDays = parseInt(document.getElementById('extensionDays').value);
+    if (!prevEndStr) return alert('⚠️ الرجاء إدخال تاريخ انتهاء الاجازة السابقة');
+    if (!extensionDays || extensionDays <= 0) return alert('⚠️ الرجاء إدخال مدة التمديد بالأيام صحيحة');
+
+    const prevEndDate = new Date(prevEndStr + 'T00:00:00');
+    const newEndDate = new Date(prevEndDate);
+    newEndDate.setDate(newEndDate.getDate() + extensionDays);
+
+    message = `﷽
+
+**قرار صـادر مـن <@&1071933369698496532> 
+
+الموضوع : تمديد اجازة خارجية 
+
+للمسعف : ${copyUser}
+
+المدة : ${extensionDays} يوم
+
+إلى تاريخ : ${formatDate(newEndDate)}
+
+
+إعتماد :
+<@&1071933358503903242> 
+<@725655707764129813>  
+
+<@&1071933359086911561> 
+<@813079786855464961>   **`;
+  }
+
+  document.getElementById('output').textContent = message;
 }
 
 function copyToClipboard() {
-  const text = document.getElementById("output").textContent;
+  const text = document.getElementById('output').textContent;
   if (!text.trim()) return alert("الرجاء إنشاء القرار أولاً");
   navigator.clipboard.writeText(text);
   alert("✅ تم نسخ القرار بنجاح!");
@@ -189,5 +203,3 @@ function copyToClipboard() {
 
 </body>
 </html>
-
-
