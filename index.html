@@ -6,17 +6,25 @@
 <style>
   body {
     font-family: "Tahoma", sans-serif;
-    background-color: #f3f3f3;
+    background-image: url('https://raw.githubusercontent.com/xhhp1/medicaljpg/main/medic.jpg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     padding: 30px;
     text-align: right;
+    color: #000;
   }
-  .container {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    max-width: 500px;
+  .overlay {
+    background-color: rgba(255, 255, 255, 0.85);
+    border-radius: 20px;
+    max-width: 550px;
     margin: auto;
-    box-shadow: 0 0 10px #ccc;
+    padding: 25px 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+  }
+  h2 {
+    text-align: center;
+    color: #0f4c5c;
   }
   label {
     display: block;
@@ -30,30 +38,37 @@
     border-radius: 8px;
     border: 1px solid #ccc;
     text-align: right;
+    font-size: 15px;
   }
   button {
     margin-top: 15px;
     padding: 10px 20px;
-    background-color: #2b7a78;
+    background-color: #0f4c5c;
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     font-size: 16px;
+    width: 100%;
+  }
+  button:hover {
+    background-color: #136f63;
   }
   pre {
-    background: #f8f8f8;
+    background: #ffffffcc;
     padding: 15px;
     border-radius: 10px;
     margin-top: 20px;
     white-space: pre-wrap;
     direction: rtl;
+    border: 1px solid #ccc;
+    font-size: 15px;
   }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="overlay">
   <h2>نموذج الإجازة الداخلية</h2>
 
   <label>الكوبي يوزر:</label>
