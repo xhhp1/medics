@@ -83,7 +83,7 @@
   <input type="text" id="nameCode" placeholder="أدخل الاسم والرقم الميداني">
 
   <label>الكوبي ايدي:</label>
-  <input type="text" id="copyId" placeholder="أدخل الكوبي ايدي ">
+  <input type="text" id="copyId" placeholder="أدخل الكوبي ايدي مثل 1198380929169764382">
 
   <div id="violationsField" style="display:none;">
     <label>هل يوجد عليه مخالفات سابقه:</label>
@@ -122,6 +122,7 @@ function generate() {
   if (level === 'متدرب' || level === 'مستوى 1') {
     let days = level === 'متدرب' ? 14 : 7;
     let fine = level === 'متدرب' ? '1,000,000' : '500,000';
+    let reason = level === 'متدرب' ? 'استقالة بمستوى متدرب' : 'استقالة بمستوى 1';
 
     result = `﷽**
 
@@ -137,7 +138,7 @@ function generate() {
  
 العقوبة الاجماليه : فصل من الخدمه + منع من التوظيف (${days}) ايام + غرامه مالية بقيمه (${fine})
 
-سبب الفصل من الخدمة : ................... 
+سبب الفصل من الخدمة : ${reason}
 
 
 إعتماد :
