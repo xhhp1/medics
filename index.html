@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>نموذج الإجازة الداخلية</title>
+<style>
+  body {
+    font-family: "Tahoma", sans-serif;
+    background-color: #f3f3f3;
+    padding: 30px;
+    text-align: right;
+  }
+  .container {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    box-shadow: 0 0 10px #ccc;
+  }
+  label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    text-align: right;
+  }
+  button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #2b7a78;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  pre {
+    background: #f8f8f8;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    white-space: pre-wrap;
+    direction: rtl;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>نموذج الإجازة الداخلية</h2>
+
+  <label>الكوبي يوزر:</label>
+  <input type="text" id="copyUser" placeholder="أدخل الكوبي يوزر">
+
+  <label>مدة الإجازة (بالساعات):</label>
+  <input type="number" id="vacationDuration" placeholder="أدخل المدة">
+
+  <label>الرصيد المتبقي (بالساعات):</label>
+  <input type="number" id="balance" placeholder="أدخل الرصيد">
+
+  <label>تبدأ من (الوقت):</label>
+  <input type="datetime-local" id="startTime">
+
+  <button onclick="generate()">إنشاء القرار</button>
+
+  <pre id="output"></pre>
+</div>
+
+<script>
+function generate() {
+  const copyUser = document.getElementById("copyUser").value || "كوبي ايدي";
+  const duration = parseFloat(document.getElementById("vacationDuration").value) || 0;
+  const balance = parseFloat(document.getElementById("balance").value) || 0;
+  const startTime = document.getElementById("startTime").value;
+
+  // Timezone adjustment for Mecca
+  const startDate = new Date(startTime);
+  const endDate = new Date(startDate.getTime() + duration * 60 * 60 * 1000);
+
+  const options = { 
+    hour: "2-digit", 
+    minute: "2-digit", 
+    hour12: true, 
+    timeZone: "Asia/Riyadh" 
+  };
+
+  const startStr = startDate.toLocaleTimeString("ar-SA", options);
+  const endStr = endDate.toLocaleTimeString("ar-SA", options);
+
+  const remaining = balance - duration;
+
+  const result = `
+﷽
+
+**قرار صـادر مـن <@&1071933369698496532>**
+
+الموضوع : إجازة داخلية
+
+للمسعف : ${copyUser}
+
+المدة : ${duration} ساعة
+
+من الساعة : ${startStr}
+إلى الساعة : ${endStr}
+
+الرصيد المتبقي : ${remaining} ساعة
+
+إعتماد :
+<@&1071933358503903242>
+<@725655707764129813>
+
+<@&1071933359086911561>
+<@813079786855464961>
+`;
+
+  document.getElementById("output").textContent = result;
+}
+</script>
+
+</body>
+</html>
