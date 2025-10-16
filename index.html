@@ -529,13 +529,11 @@ function generateRoleRequest() {
   if (!copyId) return alert("⚠️ الرجاء إدخال الكوبي ايدي");
   if (!type) return alert("⚠️ الرجاء اختيار نوع الطلب");
   if (!copyId.startsWith("<@")) copyId = `<@${copyId}>`;
-  const result = `﷽
-
-**قرار صادر من <@&1071933369698496532>**
+  const result = `
+  
+الشخص : ${copyId}
 
 الموضوع : ${type}
-
-الشخص : ${copyId}
 
 
 <@&1071933358503903242>            
@@ -670,6 +668,7 @@ function copyTemplate() {
 </script>
 </body>
 </html>
+
 
 
 
