@@ -105,6 +105,9 @@
     <button class="tab-btn" onclick="showForm('resignation')">الاستقالة</button>
     <button class="tab-btn" onclick="showForm('externalLeave')">إجازة خارجية</button>
     <button class="tab-btn" onclick="showForm('assignment')">نموذج الانتداب</button>
+    <!-- NEW TABS ADDED -->
+    <button class="tab-btn" onclick="showForm('rolesRequest')">طلب الرولات</button>
+    <button class="tab-btn" onclick="showForm('ticketTemplates')">نماذج التكتات</button>
   </div>
 
   <!-- الإجازة الداخلية -->
@@ -203,6 +206,60 @@
     <button class="generate" onclick="copyAssignment()">نسخ القرار</button>
     <pre id="ass_output"></pre>
   </div>
+
+  <!-- ====== NEW: طلب الرولات (from your provided code) ====== -->
+  <div id="rolesRequest" class="form-section">
+    <h3>طلب الرولات</h3>
+    <label>الكوبي ايدي:</label>
+    <input type="text" id="role_copyId" placeholder="أدخل الكوبي ايدي">
+    <label>نوع الطلب:</label>
+    <select id="role_type">
+      <option value="">-- اختر نوع الطلب --</option>
+      <option value="ازاله رولات الهلال الاحمر + ازاله الاسم + منع التوظيف 14 يوم">ازاله رولات الهلال الاحمر + ازاله الاسم + منع التوظيف 14 يوم</option>
+      <option value="ازاله رولات الهلال الاحمر + ازاله الاسم + منع التوظيف 7 ايام">ازاله رولات الهلال الاحمر + ازاله الاسم + منع التوظيف 7 ايام</option>
+      <option value="ازاله رولات الهلال الاحمر + ازاله الاسم">ازاله رولات الهلال الاحمر + ازاله الاسم</option>
+      <option value="اضافه رول اجازة وظيفيه">اضافه رول اجازة وظيفيه</option>
+      <option value="ازاله رول اجازة وظيفيه">ازاله رول اجازة وظيفيه</option>
+      <option value="اضافة رول العمليات">اضافة رول العمليات</option>
+      <option value="ازاله رولات الهلال الاحمر">ازاله رولات الهلال الاحمر</option>
+    </select>
+    <button class="generate" onclick="generateRoleRequest()">إنشاء الطلب</button>
+    <button class="generate" onclick="copyRoleRequest()">نسخ الطلب</button>
+    <pre id="role_output"></pre>
+  </div>
+
+  <!-- ====== NEW: نماذج التكتات (template UI) ====== -->
+  <div id="ticketTemplates" class="form-section">
+    <h3>نماذج التكتات</h3>
+
+    <label>اختر الصيغة:</label>
+    <select id="templateSelect" onchange="showTemplate()">
+      <option value="">-- اختر الصيغة --</option>
+        <option value="داخلية">صيغة الإجازة الداخلية</option>
+        <option value="خارجية">صيغة الإجازة الخارجية</option>
+        <option value="عودةداخلية">صيغة العودة من إجازة داخلية</option>
+        <option value="عودةخارجية">صيغة العودة من إجازة خارجية</option>
+        <option value="غيرمستوفين">صيغة الإجازة الداخلية لغير المستوفين</option>
+        <option value="قبولاستقالة">صيغة قبول الإستقالة</option>
+        <option value="سفلة">صيغة رفض الإستقالة للمتدرب</option>
+        <option value="رفض">صيغة رفض الإستقالة لمستوى 1</option>
+        <option value="اهمال">صيغة إهمال التكت</option>
+        <option value="ازالة">صيغة إزالة منع التوظيف</option>
+        <option value="انتداب">صيغة قبول الإنتداب</option>
+        <option value="موادع">صيغة الموادع</option>
+        <option value="انعاش">صيغة طلب الانعاش</option>
+        <option value="شكوى">صيغة استلام الشكوى</option>
+    </select>
+
+    <div id="daysBox" style="display:none; margin-top:10px;">
+      <label>مدة الانتداب (أيام):</label>
+      <input type="number" id="daysInput" value="5" oninput="updateDays()" placeholder="عدد الأيام">
+    </div>
+
+    <pre id="templateBox" style="min-height:120px; margin-top:12px;"></pre>
+    <button class="generate" onclick="copyTemplate()">نسخ الصيغة</button>
+  </div>
+
 </div>
 
 <script>
@@ -466,8 +523,157 @@ function generateAssignment(){
 }
 function copyAssignment(){navigator.clipboard.writeText(document.getElementById('ass_output').textContent); alert("✅ تم نسخ القرار بنجاح!");}
 
+/* --------- ADDED JS: rolesRequest (exactly as you provided) --------- */
+function generateRoleRequest() {
+  let copyId = document.getElementById("role_copyId").value.trim();
+  const type = document.getElementById("role_type").value;
+  if (!copyId) return alert("⚠️ الرجاء إدخال الكوبي ايدي");
+  if (!type) return alert("⚠️ الرجاء اختيار نوع الطلب");
+  if (!copyId.startsWith("<@")) copyId = `<@${copyId}>`;
+  const result = `﷽
+
+**قرار صادر من <@&1071933369698496532>**
+
+الموضوع : ${type}
+
+للمسعف : ${copyId}
+
+إعتماد :
+<@&1071933358503903242>
+<@725655707764129813>
+
+<@&1071933359086911561>
+<@813079786855464961>
+`;
+  document.getElementById("role_output").textContent = result;
+}
+
+function copyRoleRequest() {
+  const text = document.getElementById("role_output").textContent.trim();
+  if (!text) return alert("⚠️ لا يوجد نص لنسخه.");
+  navigator.clipboard.writeText(text)
+    .then(() => alert("✅ تم نسخ القرار بنجاح!"))
+    .catch(() => alert("❌ حدث خطأ أثناء النسخ."));
+}
+
+/* --------- ADDED JS: templates & helper functions (exactly as you provided) --------- */
+const templates = {
+  "داخلية": `لقد تم منحك إجازة داخلية محدودة الشروط:
+
+1- يرجى الإلتزام بتاريخ العودة المدون في : https://discord.com/channels/1071933157097615480/1202354280514990212 وقم بالتفاعل بـ ✅ على الإجازة.
+
+2- في حال عدم التفاعل وعدم تغيير الوظيفة خلال أول 15 دقيقة سوف تلغى اجازتك , ولا يحق لك المطالبة بإسترداد رصيدها .
+
+3- عند إنتهاء توقيت الإجازة قم بفتح تذكرة مساعدة من الشؤون الإدارية لإثبات العودة مع تصوير الهوية .
+
+4- يمنع طلب التمديد أو طلب إجازة أخرى في نفس اليوم .
+
+- كما ننوه يمنع منعاً باتاً تغيير الاسم داخل المقاطعة من مواقع تغيير الهويات عند الخروج في الإجازة الداخلية ويتم متابعة الموضوع من قبل إدارة الرقابة والتفتيش 
+
+*** عدم إلتزامك بأي تنويه مدون أعلاه يعرضك للمخالفة . ***`,
+  "خارجية": `لقد تم منحك اجازة خارجية وفق الشروط التالية:
+
+1- يرجى الإلتزام بتاريخ العودة المدون في : https://discord.com/channels/1071933157097615480/1202354280514990212 وقم بالتفاعل بـ ✅ على الإجازة.
+2- يسمح لك بالتمديد قبل إنتهاء الاجازة حسب https://discord.com/channels/1071933157097615480/1071934528320454818/1289312826229391471 .
+3- سيتم منحك رول <@&1079860325056270427> في حال العوده من الاجازه رجاءاً قم بفتح تيكت لابلاغنا بعودتك وسماح الادارة بالمباشرة الميدانية.
+
+***عدم إلتزامك بأي تنويه مدون أعلاه يعرضك للمخالفة .***`,
+  "عودةداخلية": `عوداً حميداً ونتمنى التوفيق لك في الميدان
+
+شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو <:imagesremovebgpreview:1086073447840485527>
+في حال عدم وجود استفسارات أخرى يرجى إغلاق التكت وتقييم مستوى الخدمة ؛
+شاكرين ومقدرين لكم , دمتم بخير .`,
+  "عودةخارجية": `عوداً حميداً ونتمنى التوفيق لك في الميدان
+
+شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو <:imagesremovebgpreview:1086073447840485527>
+في حال عدم وجود استفسارات أخرى يرجى إغلاق التكت وتقييم مستوى الخدمة ؛
+شاكرين ومقدرين لكم , دمتم بخير .`,
+  "غيرمستوفين": `الإجازة الداخلية لغير الموهلين :
+
+- سيتم رفض طلب إجازتك الداخلية بسبب : ( طلب إجازة داخلية في غير الأيام المسموحة ودون المباشرة 3 ساعات . )
+- ثانياً : سيتم اصدار لك انذار + تأخير ترقية + (غرامة بقيمة 500 الف ).`,
+  "قبولاستقالة": `تم قبول طلب استقالتك بنجاح ونشكر جهودك المبذولة والملحوظة لدى القطاع ونسأل الله لك التوفيق والسداد .
+
+توقيع واعتماد :
+<@&1071933358503903242>
+<@725655707764129813>
+
+<@&1071933359086911561>
+<@813079786855464961>`,
+  "سفلة": `بناءًا على رغبتك في الاستقالة عليك الالتزام بما هو آت:
+
+1-اذكر موقعك للمشرف
+2-سيصدر لك غرامة بقيمة ( 1.000.000 )
+3-سيتم منحك رول منع توظيف ( 14 يوم )
+4-بعد نزول القرار فورًا توجة لمركز التوظيف قم بتغيير وظيفتك خلاف ذلك يعتبر تهرب وظيفي`,
+  "رفض": `بناءًا على رغبتك في الاستقالة عليك الالتزام بما هو آت :
+
+1-اذكر موقعك للمشرف
+2-سيصدر لك غرامة بقيمة ( 500.000 )
+3-سيتم منحك رول منع توظيف ( 7 أيام )
+4-بعد نزول القرار فورًا توجة لمركز التوظيف قم بتغيير وظيفتك خلاف ذلك يعتبر تهرب وظيفي`,
+  "اهمال": `عزيزي المستفيد :
+إهمال التكت مخالفة منصوص عليها في دستور مقاطعة بوليتو فضلاً نرجو عدم اهمال التكت <:imagesremovebgpreview:1086073447840485527>`,
+  "ازالة": `عزيزي المستفيد : <:imagesremovebgpreview:1086073447840485527>
+
+شاكرين لك تواصلك وتم التحقق من بياناتك وسيتم خلال الساعات القادمة إزالة منع التوظيف <:imagesremovebgpreview:1086073447840485527>`,
+  "انتداب": (days=5) => `لقد تم منحك أنتداب لمدة ${days} أيام :
+
+1- يرجى الإلتزام بتاريخ العودة المدون في : https://discord.com/channels/1071933157097615480/1202354280514990212 وقم بالتفاعل بـ ✅ على الانتداب .
+
+2- في حال تم قبول انتدابك من قبل القطاع الثانوي ، بأمكانك تغيير وظيفتك بعد الحصول على رول منتدب.
+
+3- يمنع منعاً باتا كسر الانتداب قبل انتهاء مدة انتدابك ، وكسر الانتداب فقط من قبل القيادة .
+
+***عدم إلتزامك بأي تنويه مدون أعلاه يعرضك للمخالفة .***`,
+  "موادع": `شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو <:imagesremovebgpreview:1086073447840485527>
+في حال عدم وجود استفسارات أخرى يرجى إغلاق التكت وتقييم مستوى الخدمة ؛
+شاكرين ومقدرين لكم , دمتم بخير .`,
+  "انعاش": `عزيزي المستفيد: <:imagesremovebgpreview:1086073447840485527>
+نود تنبيهك بأن طلب الانعاش مخالفة منصوص عليها من قبل ادارة الرقابة والتفتيش <:imagesremovebgpreview:1086073447840485527>`,
+  "شكوى": `نشكر لكم تواصلكم وإهتمامكم , ولتسريع عملية معالجة الشكوى نرجوا توفير ما يلي :
+
+- اسم المسعف بشكل واضح .
+- تصوير واضح لا يقل عن 10 دقائق , منها 5 قبل وقوع الحادثة و 5 أثناء وبعد حدوث الحادثة , دون قص اللقطات .
+- الإلتزام بإرفاق إثبات الشكوى داخل تكت الشكوى , أو في حال تعذر ذلك رفعه على موقع : 
+https://streamable.com/
+حسب التوصيات من إدارة الرقابة والتفتيش .
+
+***عدم إلتزامك بأي بند من البنود المذكورة أعلاه يلغي شكواك .***`
+};
+
+function showTemplate() {
+  const sel = document.getElementById('templateSelect').value;
+  const box = document.getElementById('templateBox');
+  const daysBox = document.getElementById('daysBox');
+  if (sel === 'انتداب') {
+    daysBox.style.display = 'block';
+    const days = parseInt(document.getElementById('daysInput').value) || 5;
+    box.textContent = templates['انتداب'](days);
+  } else {
+    daysBox.style.display = 'none';
+    box.textContent = templates[sel] || '';
+  }
+}
+
+function updateDays() {
+  const days = parseInt(document.getElementById('daysInput').value) || 5;
+  document.getElementById('templateBox').textContent = templates['انتداب'](days);
+}
+
+function copyTemplate() {
+  const txt = document.getElementById('templateBox').textContent;
+  if (!txt) return alert('لا يوجد نص لنسخه. اختر صيغة أولاً.');
+  navigator.clipboard.writeText(txt);
+  alert('✅ تم نسخ الصيغة بنجاح!');
+}
 </script>
 </body>
 </html>
+
+
+
+
+
 
 
