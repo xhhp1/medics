@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -22,77 +23,26 @@
     padding: 25px 30px;
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
   }
-  h2 {
-    text-align: center;
-    color: #8B0000;
-  }
-  .tabs {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .tab-btn {
-    flex: 1;
-    background-color: #8B0000;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  .tab-btn:hover {
-    background-color: #a91c1c;
-  }
-  .form-section {
-    display: none;
-  }
-  label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
+  h2 { text-align: center; color: #8B0000; }
+  .tabs { display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .tab-btn { flex: 1; background-color: #8B0000; color: white; border: none; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 16px; }
+  .tab-btn:hover { background-color: #a91c1c; }
+  .form-section { display: none; }
+  label { display: block; margin-top: 10px; font-weight: bold; }
   input, select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    text-align: right;
-    font-size: 15px;
+    width: 100%; padding: 8px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc;
+    text-align: right; font-size: 15px;
   }
-  .time-group {
-    display: flex;
-    gap: 10px;
-  }
-  .time-group input, .time-group select {
-    flex: 1;
-  }
+  .time-group { display: flex; gap: 10px; }
+  .time-group input, .time-group select { flex: 1; }
   button.generate {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #8B0000;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
+    margin-top: 15px; padding: 10px 20px; background-color: #8B0000; color: white;
+    border: none; border-radius: 10px; cursor: pointer; font-size: 16px; width: 100%;
   }
-  button.generate:hover {
-    background-color: #a91c1c;
-  }
+  button.generate:hover { background-color: #a91c1c; }
   pre {
-    background: #ffffffcc;
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 20px;
-    white-space: pre-wrap;
-    direction: rtl;
-    border: 1px solid #ccc;
-    font-size: 15px;
+    background: #ffffffcc; padding: 15px; border-radius: 10px; margin-top: 20px; white-space: pre-wrap;
+    direction: rtl; border: 1px solid #ccc; font-size: 15px;
   }
 </style>
 </head>
@@ -162,24 +112,31 @@
   <!-- إجازة خارجية -->
   <div id="externalLeave" class="form-section">
     <h3>إجازة خارجية</h3>
+
     <label>أختر نوع الاجازة الخارجية:</label>
     <select id="ext_leaveType" onchange="updateExtForm()">
       <option value="">-- اختر نوع الإجازة --</option>
       <option value="اجازة خارجية">اجازة خارجية</option>
       <option value="تمديد اجازة خارجية">تمديد اجازة خارجية</option>
+      <!-- ★ ADDED: انتهاء اجازة خارجية -->
+      <option value="انتهاء اجازة خارجية">انتهاء اجازة خارجية</option>
     </select>
+
     <label>الكوبي ايدي:</label>
     <input type="text" id="ext_copyUser" placeholder="أدخل الكوبي ايدي">
+
     <div id="ext_leaveDaysField" style="display:none;">
       <label>مدة الإجازة (بالأيام):</label>
       <input type="number" id="ext_leaveDays" placeholder="أدخل عدد الأيام">
     </div>
+
     <div id="ext_extensionField" style="display:none;">
       <label>تاريخ انتهاء الاجازة السابقة:</label>
       <input type="date" id="ext_previousEndDate">
       <label>مدة التمديد (بالأيام):</label>
       <input type="number" id="ext_extensionDays" placeholder="أدخل عدد الأيام">
     </div>
+
     <button class="generate" onclick="generateExternalLeave()">إنشاء القرار</button>
     <button class="generate" onclick="copyExternalLeave()">نسخ القرار</button>
     <pre id="ext_output"></pre>
@@ -206,7 +163,7 @@
     <pre id="ass_output"></pre>
   </div>
 
-  <!-- ====== NEW: طلب الرولات (from your provided code) ====== -->
+  <!-- طلب الرولات -->
   <div id="rolesRequest" class="form-section">
     <h3>طلب الرولات</h3>
     <label>الكوبي ايدي:</label>
@@ -227,27 +184,27 @@
     <pre id="role_output"></pre>
   </div>
 
-  <!-- ====== NEW: نماذج التكتات (template UI) ====== -->
+  <!-- نماذج التكتات -->
   <div id="ticketTemplates" class="form-section">
     <h3>نماذج التكتات</h3>
 
     <label>اختر الصيغة:</label>
     <select id="templateSelect" onchange="showTemplate()">
       <option value="">-- اختر الصيغة --</option>
-        <option value="داخلية">صيغة الإجازة الداخلية</option>
-        <option value="خارجية">صيغة الإجازة الخارجية</option>
-        <option value="عودةداخلية">صيغة العودة من إجازة داخلية</option>
-        <option value="عودةخارجية">صيغة العودة من إجازة خارجية</option>
-        <option value="غيرمستوفين">صيغة الإجازة الداخلية لغير المستوفين</option>
-        <option value="قبولاستقالة">صيغة قبول الإستقالة</option>
-        <option value="سفلة">صيغة الإستقالة للمتدرب</option>
-        <option value="رفض">صيغة الإستقالة لمستوى 1</option>
-        <option value="اهمال">صيغة إهمال التكت</option>
-        <option value="ازالة">صيغة إزالة منع التوظيف</option>
-        <option value="انتداب">صيغة قبول الإنتداب</option>
-        <option value="موادع">صيغة الموادع</option>
-        <option value="انعاش">صيغة طلب الانعاش</option>
-        <option value="شكوى">صيغة استلام الشكوى</option>
+      <option value="داخلية">صيغة الإجازة الداخلية</option>
+      <option value="خارجية">صيغة الإجازة الخارجية</option>
+      <option value="عودةداخلية">صيغة العودة من إجازة داخلية</option>
+      <option value="عودةخارجية">صيغة العودة من إجازة خارجية</option>
+      <option value="غيرمستوفين">صيغة الإجازة الداخلية لغير المستوفين</option>
+      <option value="قبولاستقالة">صيغة قبول الإستقالة</option>
+      <option value="سفلة">صيغة الإستقالة للمتدرب</option>
+      <option value="رفض">صيغة الإستقالة لمستوى 1</option>
+      <option value="اهمال">صيغة إهمال التكت</option>
+      <option value="ازالة">صيغة إزالة منع التوظيف</option>
+      <option value="انتداب">صيغة قبول الإنتداب</option>
+      <option value="موادع">صيغة الموادع</option>
+      <option value="انعاش">صيغة طلب الانعاش</option>
+      <option value="شكوى">صيغة استلام الشكوى</option>
     </select>
 
     <div id="daysBox" style="display:none; margin-top:10px;">
@@ -406,8 +363,18 @@ function copyResignation(){navigator.clipboard.writeText(document.getElementById
 // ---------- إجازة خارجية ----------
 function updateExtForm(){
   const type=document.getElementById('ext_leaveType').value;
-  document.getElementById('ext_leaveDaysField').style.display=(type==='اجازة خارجية')?'block':'none';
-  document.getElementById('ext_extensionField').style.display=(type==='تمديد اجازة خارجية')?'block':'none';
+  const daysField = document.getElementById('ext_leaveDaysField');
+  const extField  = document.getElementById('ext_extensionField');
+
+  // default hide/show
+  daysField.style.display   = (type==='اجازة خارجية') ? 'block' : 'none';
+  extField.style.display    = (type==='تمديد اجازة خارجية') ? 'block' : 'none';
+
+  // For "انتهاء اجازة خارجية": hide extra fields (leave copy input as-is)
+  if (type === 'انتهاء اجازة خارجية') {
+    daysField.style.display = 'none';
+    extField.style.display  = 'none';
+  }
 }
 function formatExtDate(date){
   const yyyy=date.getFullYear();
@@ -418,18 +385,42 @@ function formatExtDate(date){
 function generateExternalLeave(){
   const type=document.getElementById('ext_leaveType').value;
   if(!type) return alert('⚠️ الرجاء اختيار نوع الإجازة');
+
   let copyUser=document.getElementById("ext_copyUser").value.trim();
   if(!copyUser) return alert('⚠️ الرجاء إدخال الكوبي ايدي');
   if(!copyUser.startsWith('<@')) copyUser=`<@${copyUser}>`;
+
   let tzDate=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Riyadh"}));
-  let message='';
+
+  // --- انتهاء اجازة خارجية ---
+  if (type === 'انتهاء اجازة خارجية') {
+    const message=`**﷽
+
+قرار صـادر مـن <@&1071933369698496532 > 
+
+الموضوع : انتهاء اجازه خارجيه
+
+المسعف : ${copyUser}
+
+
+إعتماد :
+<@&1071933358503903242> 
+<@725655707764129813>  
+
+<@&1071933359086911561> 
+<@813079786855464961>   **`;
+    document.getElementById('ext_output').textContent=message;
+    return;
+  }
+
+  // --- اجازة خارجية ---
   if(type==='اجازة خارجية'){
     const leaveDays=parseInt(document.getElementById('ext_leaveDays').value);
     if(!leaveDays||leaveDays<=0) return alert('⚠️ الرجاء إدخال مدة الإجازة بالأيام صحيحة');
     const startDate=tzDate;
     const endDate=new Date(startDate);
     endDate.setDate(endDate.getDate()+leaveDays);
-    message=`﷽**
+    const message=`﷽**
 
 قرار صـادر مـن <@&1071933369698496532> 
 
@@ -450,7 +441,12 @@ function generateExternalLeave(){
 
 <@&1071933359086911561> 
 <@813079786855464961>   **`;
-  } else if(type==='تمديد اجازة خارجية'){
+    document.getElementById('ext_output').textContent=message;
+    return;
+  }
+
+  // --- تمديد اجازة خارجية ---
+  if(type==='تمديد اجازة خارجية'){
     const prevEndStr=document.getElementById('ext_previousEndDate').value;
     const extensionDays=parseInt(document.getElementById('ext_extensionDays').value);
     if(!prevEndStr) return alert('⚠️ الرجاء إدخال تاريخ انتهاء الاجازة السابقة');
@@ -458,7 +454,7 @@ function generateExternalLeave(){
     const prevEndDate=new Date(prevEndStr+'T00:00:00');
     const newEndDate=new Date(prevEndDate);
     newEndDate.setDate(newEndDate.getDate()+extensionDays);
-    message=`﷽
+    const message=`﷽
 
 **قرار صـادر مـن <@&1071933369698496532> 
 
@@ -477,10 +473,14 @@ function generateExternalLeave(){
 
 <@&1071933359086911561> 
 <@813079786855464961>   **`;
+    document.getElementById('ext_output').textContent=message;
+    return;
   }
-  document.getElementById('ext_output').textContent=message;
 }
-function copyExternalLeave(){navigator.clipboard.writeText(document.getElementById('ext_output').textContent); alert("✅ تم نسخ القرار بنجاح!");}
+function copyExternalLeave(){
+  navigator.clipboard.writeText(document.getElementById('ext_output').textContent);
+  alert("✅ تم نسخ القرار بنجاح!");
+}
 
 // ---------- نموذج الانتداب ----------
 function generateAssignment(){
@@ -522,7 +522,7 @@ function generateAssignment(){
 }
 function copyAssignment(){navigator.clipboard.writeText(document.getElementById('ass_output').textContent); alert("✅ تم نسخ القرار بنجاح!");}
 
-/* --------- ADDED JS: rolesRequest (exactly as you provided) --------- */
+// --------- rolesRequest ---------
 function generateRoleRequest() {
   let copyId = document.getElementById("role_copyId").value.trim();
   const type = document.getElementById("role_type").value;
@@ -543,7 +543,6 @@ function generateRoleRequest() {
 `;
   document.getElementById("role_output").textContent = result;
 }
-
 function copyRoleRequest() {
   const text = document.getElementById("role_output").textContent.trim();
   if (!text) return alert("⚠️ لا يوجد نص لنسخه.");
@@ -552,7 +551,7 @@ function copyRoleRequest() {
     .catch(() => alert("❌ حدث خطأ أثناء النسخ."));
 }
 
-/* --------- ADDED JS: templates & helper functions (exactly as you provided) --------- */
+// --------- templates ---------
 const templates = {
  "داخلية": `لقد تم منحك إجازة داخلية محدودة الشروط :
 
@@ -567,7 +566,8 @@ const templates = {
 \`\`\`diff
 - كما ننوه يمنع منعاً باتاً تغيير الاسم داخل المقاطعة من مواقع تغيير الهويات عند الخروج في الإجازة الداخلية ويتم متابعة الموضوع من قبل إدارة الرقابة والتفتيش عدم إلتزامك بأي تنويه مدون أعلاه يعرضك للمخالفة.
   
-  \`\`\``,"خارجية": `لقد تم منحك إجازة خارجية وفق الشروط التالية:
+  \`\`\``,
+ "خارجية": `لقد تم منحك إجازة خارجية وفق الشروط التالية:
 
 **1- يرجى الإلتزام بتاريخ العودة المدون في : https://discord.com/channels/1071933157097615480/1202354280514990212 وقم بالتفاعل بـ ✅  على الإجازة.**
 
@@ -576,22 +576,22 @@ const templates = {
 **3- سيتم منحك رول ( اجازه وظيفيه )  في حال العوده من الاجازه رجاءاً قم بفتح تيكت لابلاغنا بعودتك وسماح الادارة بالمباشرة الميدانية.**
 
 ***عدم إلتزامك بأي تنويه مدون أعلاه يعرضك للمخالفة .***`,
-  "عودةداخلية": `
+ "عودةداخلية": `
 **تم تسجيل عودتكم بنجاح يمكنك الان المباشره <:jobcenter:1152025666154418186> 
 
 شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو  <:imagesremovebgpreview:1086073447840485527>  
 في حال عدم وجود استفسارات أخرى يرجى إغلاق التكت وتقييم مستوى الخدمة ؛
 شاكرين ومقدرين لكم , دمتم بخير .**`,
-  "عودةخارجية": `عوداً حميداً ونتمنى التوفيق لك في الميدان
+ "عودةخارجية": `عوداً حميداً ونتمنى التوفيق لك في الميدان
 
 شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو <:imagesremovebgpreview:1086073447840485527>
 في حال عدم وجود استفسارات أخرى يرجى إغلاق التكت وتقييم مستوى الخدمة ؛
 شاكرين ومقدرين لكم , دمتم بخير .`,
-  "غيرمستوفين": `الإجازة الداخلية لغير الموهلين :
+ "غيرمستوفين": `الإجازة الداخلية لغير الموهلين :
 
 - سيتم رفض طلب إجازتك الداخلية بسبب : ( طلب إجازة داخلية في غير الأيام المسموحة ودون المباشرة 3 ساعات . )
 - ثانياً : سيتم اصدار لك انذار + تأخير ترقية + (غرامة بقيمة 500 الف ).`,
-  "قبولاستقالة": `تم قبول طلب استقالتك بنجاح ونشكر جهودك المبذولة والملحوظة لدى القطاع ونسأل الله لك التوفيق والسداد .
+ "قبولاستقالة": `تم قبول طلب استقالتك بنجاح ونشكر جهودك المبذولة والملحوظة لدى القطاع ونسأل الله لك التوفيق والسداد .
 
 توقيع واعتماد :
 <@&1071933358503903242>
@@ -599,24 +599,24 @@ const templates = {
 
 <@&1071933359086911561>
 <@813079786855464961>`,
-  "سفلة": `بناءًا على رغبتك في الاستقالة عليك الالتزام بما هو آت:
+ "سفلة": `بناءًا على رغبتك في الاستقالة عليك الالتزام بما هو آت:
 
 1-اذكر موقعك للمشرف
 2-سيصدر لك غرامة بقيمة ( 1.000.000 )
 3-سيتم منحك رول منع توظيف ( 14 يوم )
 4-بعد نزول القرار فورًا توجة لمركز التوظيف قم بتغيير وظيفتك خلاف ذلك يعتبر تهرب وظيفي`,
-  "رفض": `بناءًا على رغبتك في الاستقالة عليك الالتزام بما هو آت :
+ "رفض": `بناءًا على رغبتك في الاستقالة عليك الالتزام بما هو آت :
 
 1-اذكر موقعك للمشرف
 2-سيصدر لك غرامة بقيمة ( 500.000 )
 3-سيتم منحك رول منع توظيف ( 7 أيام )
 4-بعد نزول القرار فورًا توجة لمركز التوظيف قم بتغيير وظيفتك خلاف ذلك يعتبر تهرب وظيفي`,
-  "اهمال": `عزيزي المستفيد :
+ "اهمال": `عزيزي المستفيد :
 إهمال التكت مخالفة منصوص عليها في دستور مقاطعة بوليتو فضلاً نرجو عدم اهمال التكت <:imagesremovebgpreview:1086073447840485527>`,
-  "ازالة": `عزيزي المستفيد : <:imagesremovebgpreview:1086073447840485527>
+ "ازالة": `عزيزي المستفيد : <:imagesremovebgpreview:1086073447840485527>
 
 شاكرين لك تواصلك وتم التحقق من بياناتك وسيتم خلال الساعات القادمة إزالة منع التوظيف <:imagesremovebgpreview:1086073447840485527>`,
-  "انتداب": (days=5) => `لقد تم منحك أنتداب لمدة ${days} أيام :
+ "انتداب": (days=5) => `لقد تم منحك أنتداب لمدة ${days} أيام :
 
 1- يرجى الإلتزام بتاريخ العودة المدون في : https://discord.com/channels/1071933157097615480/1202354280514990212 وقم بالتفاعل بـ ✅ على الانتداب .
 
@@ -625,12 +625,12 @@ const templates = {
 3- يمنع منعاً باتا كسر الانتداب قبل انتهاء مدة انتدابك ، وكسر الانتداب فقط من قبل القيادة .
 
 ***عدم إلتزامك بأي تنويه مدون أعلاه يعرضك للمخالفة .***`,
-  "موادع": `شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو <:imagesremovebgpreview:1086073447840485527>
+ "موادع": `شكراً لتواصلكم مع <:imagesremovebgpreview:1086073447840485527> الشؤون الإدارية لقطاع الهلال الأحمر - مقاطعة بوليتو <:imagesremovebgpreview:1086073447840485527>
 في حال عدم وجود استفسارات أخرى يرجى إغلاق التكت وتقييم مستوى الخدمة ؛
 شاكرين ومقدرين لكم , دمتم بخير .`,
-  "انعاش": `عزيزي المستفيد: <:imagesremovebgpreview:1086073447840485527>
+ "انعاش": `عزيزي المستفيد: <:imagesremovebgpreview:1086073447840485527>
 نود تنبيهك بأن طلب الانعاش مخالفة منصوص عليها من قبل ادارة الرقابة والتفتيش <:imagesremovebgpreview:1086073447840485527>`,
-  "شكوى": `نشكر لكم تواصلكم وإهتمامكم , ولتسريع عملية معالجة الشكوى نرجوا توفير ما يلي :
+ "شكوى": `نشكر لكم تواصلكم وإهتمامكم , ولتسريع عملية معالجة الشكوى نرجوا توفير ما يلي :
 
 - اسم المسعف بشكل واضح .
 - تصوير واضح لا يقل عن 10 دقائق , منها 5 قبل وقوع الحادثة و 5 أثناء وبعد حدوث الحادثة , دون قص اللقطات .
@@ -654,12 +654,10 @@ function showTemplate() {
     box.textContent = templates[sel] || '';
   }
 }
-
 function updateDays() {
   const days = parseInt(document.getElementById('daysInput').value) || 5;
   document.getElementById('templateBox').textContent = templates['انتداب'](days);
 }
-
 function copyTemplate() {
   const txt = document.getElementById('templateBox').textContent;
   if (!txt) return alert('لا يوجد نص لنسخه. اختر صيغة أولاً.');
@@ -669,21 +667,3 @@ function copyTemplate() {
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
